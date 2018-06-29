@@ -1,0 +1,98 @@
+import tkinter as Tk
+import tkinter.ttk as ttk
+import tkinter.filedialog as tkfd
+import pyaudio
+from chardet import UniversalDetector
+
+import wave
+import time
+import math
+import numpy as np
+import sys
+import threading
+import os
+import shutil
+import pickle
+import glob
+import tempfile
+import csv
+
+from PIL import Image, ImageTk, ImageDraw
+
+#グローバル変数
+device_list_handler=[]
+speaker_list_handler=[]
+status_label_handler=[]
+
+class MainFrame(Tk.Frame):
+    def __init__(self, master = None):
+
+        # 初期化
+        Tk.Frame.__init__(self, master)
+        self.master.title('Main Form')
+
+        ##フレーム群の定義
+        
+        #Setting Frame
+        self.setting_frame=Tk.LabelFrame(self,relief='groove',text='Setting')
+        self.setting_frame.grid(row=0, column=0,padx=5,pady=5)
+
+        #Operation Frame
+        self.operation_frame=Tk.LabelFrame(self,relief='groove',text='Operation')
+        self.operation_frame.grid(row=1, column=0,padx=5,pady=5)
+
+        #Result Frame
+        self.result_frame=Tk.LabelFrame(self,relief='groove',text='Result')
+        self.result_frame.grid(row=2, column=0,padx=5,pady=5)
+        
+        ###各フレーム上のwidget群
+
+        ##Setting Frame
+
+        #ラベル群
+        self.setting_frame.device_label=ttk.Label( self.setting_frame,width=30,text='使用マイク')
+        self.setting_frame.speaker_label=ttk.Label( self.setting_frame,width=30,text='話者名')
+        self.setting_frame.detect_label=ttk.Label( self.setting_frame,width=10,text='検出確認')
+        self.setting_frame.channel_label=ttk.Label( self.setting_frame,width=20,text='チャンネル操作')
+
+        self.setting_frame.device_label.grid(row=0,column=0)
+        self.setting_frame.speaker_label.grid(row=0,column=1)
+        self.setting_frame.detect_label.grid(row=0,column=2)
+        self.setting_frame.channel_label.grid(row=0,column=3)
+
+        self.setting_frame.grid_columnconfigure(0,weight=0)
+        self.setting_frame.grid_columnconfigure(1,weight=0)
+        self.setting_frame.grid_columnconfigure(2,weight=0)
+        self.setting_frame.grid_columnconfigure(3,weight=0)
+
+        #ボタン(初期段階ではCH追加ボタンだけ。各CHのボタンはAddCH関数で追加する。)
+        self.setting_frame.ch_add_btn=ttk.Button(self.setting_frame,text='CH追加')
+        self.setting_frame.ch_add_btn.grid(row=1,column=3,sticky=Tk.W)
+
+        ##Operation Frame
+
+        #録音ボタン描画
+        size=40
+        im=Image.new('RGB',(size,size),(256,256,256))
+        draw = ImageDraw.Draw(im)
+        draw.rectangle((0,0,size-1,size-1), fill=(196, 196, 196), outline=(0,0,0))
+        draw.ellipse((2,2,size-3,size-3),fill=(255, 0, 0), outline=(0, 0, 0))
+        self.rec_img = ImageTk.PhotoImage(im)
+        self.operation_frame.start_btn=ttk.Button(self.operation_frame,image=self.rec_img)
+        self.operation_frame.start_btn.grid(row=0,column=0)
+
+        #停止ボタン描画
+        im=Image.new('RGB',(size,size),(256,256,256))
+        draw = ImageDraw.Draw(im)
+        draw.rectangle((0,0,size-1,size-1), fill=(196, 196, 196), outline=(0,0,0))
+        draw.rectangle((10,10,size-9,size-9), fill=(0, 0, 0), outline=(0,0,0))
+        self.stp_img = ImageTk.PhotoImage(im)
+        self.operation_frame.stop_btn=ttk.Button(self.operation_frame,image=self.stp_img)
+        self.operation_frame.stop_btn.grid(row=0,column=1)
+
+
+if __name__=='__main__':
+
+    f=MainFrame()
+    f.grid()
+    f.mainloop()
